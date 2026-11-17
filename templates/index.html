@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#102c27"><title>Waste intelligence | Bengaluru</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='modern.css') }}">
+</head>
+<body>
+  <header class="topbar" id="site-header">
+    <a class="brand" href="#overview" aria-label="Fieldnote civic data, overview"><span class="brand-mark">B</span><span>FIELDNOTE <small>URBAN SYSTEMS</small></span></a>
+    <button id="nav-toggle" class="nav-toggle" type="button" aria-label="Open navigation menu" aria-controls="primary-nav" aria-expanded="false"><span class="menu-lines" aria-hidden="true"><i></i><i></i><i></i></span><span>Menu</span></button>
+    <nav id="primary-nav" class="main-nav" aria-label="Main navigation">
+      <a class="active" aria-current="page" href="#overview">Overview</a><a href="#areas">Area analysis</a><a href="#trends">Trends</a><a href="#clustering">Clustering</a><a href="#economics">Economics</a><a href="#import">Data intake</a>
+    </nav>
+    <div id="hive-pill" class="status-pill starting" role="status" aria-live="polite"><i aria-hidden="true"></i><span>Starting | checking Hive</span></div>
+  </header>
+  <main>
+    <section class="hero" id="overview"><div><div class="eyebrow"><span class="live-dot"></span> BENGALURU · SOLID WASTE</div><h1>See what’s being<br>recorded across the city.</h1><p>A clear view of imported waste records, their coverage, and the data behind them.</p></div><div class="hero-stamp"><span>ANALYTICS ENGINE</span><b>APACHE HIVE</b><span>HIVEQL VERIFIED WHEN CONNECTED</span></div></section>
+    <section class="toolbar"><div><label for="dataset-select">CURRENT DATASET</label><select id="dataset-select"><option value="">No dataset selected</option></select><button id="sample-load-btn" type="button" class="button secondary" style="margin-left: 10px; padding: 4px 12px; font-size: 11px; min-height: 32px;">Load Bengaluru Demo Data</button></div><div id="dataset-meta" class="dataset-meta">Upload a dataset to begin. No sample measurements are shown.</div></section>
+    <div id="notice" class="notice hidden" role="status"></div>
+    <section id="interactive-filter-bar" class="panel filter-bar" style="margin-bottom: 14px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+        <span style="font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--green);">Interactive Filters:</span>
+        <label style="font-size: 11px; display: flex; align-items: center; gap: 6px;">
+          Ward:
+          <select id="quick-ward-filter" style="padding: 4px 8px; border-radius: 6px; font-size: 11px;"><option value="ALL">All Wards / Areas</option></select>
+        </label>
+        <label style="font-size: 11px; display: flex; align-items: center; gap: 6px;">
+          Category:
+          <select id="quick-cat-filter" style="padding: 4px 8px; border-radius: 6px; font-size: 11px;"><option value="ALL">All Categories</option></select>
+        </label>
+        <label style="font-size: 11px; display: flex; align-items: center; gap: 6px;">
+          From:
+          <input id="quick-date-from" type="date" style="padding: 3px 6px; border-radius: 6px; font-size: 11px;">
+        </label>
+        <label style="font-size: 11px; display: flex; align-items: center; gap: 6px;">
+          To:
+          <input id="quick-date-to" type="date" style="padding: 3px 6px; border-radius: 6px; font-size: 11px;">
+        </label>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <input id="quick-search-input" type="search" placeholder="Search ward or keyword..." style="padding: 4px 8px; border-radius: 6px; font-size: 11px; min-width: 170px;">
+        <button id="quick-filter-reset" type="button" class="button secondary" style="padding: 4px 10px; min-height: 28px; font-size: 11px;">Reset</button>
+      </div>
+    </section>
+    <section id="dashboard" class="dashboard">
+      <div class="kpis"><article class="kpi"><div class="kpi-label">RECORDED WASTE</div><div id="kpi-waste" class="kpi-value">—</div><div id="kpi-unit" class="kpi-foot">Requires compatible records</div></article><article class="kpi"><div class="kpi-label">VALID RECORDS</div><div id="kpi-records" class="kpi-value">—</div><div class="kpi-foot">Read from Hive / In-Memory</div></article><article class="kpi"><div class="kpi-label">AREAS COVERED</div><div id="kpi-areas" class="kpi-value">—</div><div class="kpi-foot">Distinct mapped area names or ward IDs</div></article><article class="kpi"><div class="kpi-label">DATE COVERAGE</div><div id="kpi-dates" class="kpi-value date-value">—</div><div class="kpi-foot">From observation dates</div></article><article class="kpi"><div class="kpi-label">DAILY AVERAGE</div><div id="kpi-avg" class="kpi-value">—</div><div class="kpi-foot">Mean daily volume</div></article><article class="kpi"><div class="kpi-label">TOP WARD BY VOLUME</div><div id="kpi-top-ward" class="kpi-value" style="font-size: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">—</div><div id="kpi-top-ward-foot" class="kpi-foot">Leading contributor</div></article></div>
+      <div class="overview-charts" aria-label="Hive-backed dataset visualizations">
+        <article class="panel overview-chart-card"><div class="panel-head"><div><div class="kpi-label">TIME SERIES</div><h2>Waste over time</h2></div></div><div id="overview-trend-message" class="chart-state" role="status">Select a Hive-imported dataset to see its dated observations.</div><div class="overview-chart-wrap"><svg id="overview-trend-chart" class="hidden overview-chart trend-chart" role="img" aria-label="Waste over time from Hive aggregated observations"></svg></div><p id="overview-trend-caption" class="analytics-note"></p></article>
+        <article class="panel overview-chart-card"><div class="panel-head"><div><div class="kpi-label">MATERIAL BREAKDOWN</div><h2>Material composition</h2></div></div><div id="overview-category-message" class="chart-state" role="status">Category totals appear when material columns are mapped.</div><div class="overview-chart-wrap"><svg id="overview-category-chart" class="hidden overview-chart" role="img" aria-label="Material composition using Hive category totals"></svg></div></article>
+        <article class="panel overview-chart-card"><div class="panel-head"><div><div class="kpi-label">AREA COMPARISON</div><h2>Top areas by recorded waste</h2></div></div><div id="overview-area-message" class="chart-state" role="status">Select a Hive-imported dataset to compare recorded area totals.</div><div class="overview-chart-wrap"><svg id="overview-area-chart" class="hidden overview-chart area-overview-chart" role="img" aria-label="Top areas by waste totals queried from Hive"></svg></div></article>
+      </div>
+      <div class="lower-grid"><article class="panel coverage"><div class="panel-head"><div><div class="kpi-label">COVERAGE &amp; QUALITY</div><h2>What this dataset tells us</h2></div><span class="panel-icon">↗</span></div><div id="quality-content" class="empty-copy">Select a Hive-imported dataset to see its coverage and limitations.</div></article><article class="panel categories"><div class="panel-head"><div><div class="kpi-label">MATERIAL BREAKDOWN</div><h2>Recorded categories</h2></div></div><div id="category-warning" class="analytics-note hidden" role="status"></div><div id="category-content" class="empty-copy">Category totals appear when material columns are mapped.</div></article></div>
+    </section>
+    <section id="areas" class="analysis-section"><div class="section-heading"><div><div class="eyebrow">02 / AREA ANALYSIS</div><h2>Compare recorded totals by area</h2><p>HiveQL grouped totals with record coverage. Rankings are withheld when keys cannot be compared safely.</p></div></div><div class="panel analytics-panel"><div class="control-row"><label>From<input id="area-from" type="date"></label><label>To<input id="area-to" type="date"></label><label>Search areas<input id="area-search" type="search" maxlength="80" placeholder="Search returned areas"></label><label>Sort<select id="area-sort"><option value="total">Highest recorded total</option><option value="records">Most records</option><option value="name">Area name</option></select></label><button id="area-load" class="button secondary">Load comparison</button></div><div id="area-message" class="empty-copy" role="status">Select an imported dataset to load area analysis.</div><div class="chart-scroll"><svg id="area-chart" class="hidden data-chart" role="img" aria-label="Recorded totals by area"></svg></div><div class="table-wrap"><table class="analytics-table"><thead><tr><th>Area</th><th>Recorded total</th><th>Records with value</th><th>Records</th></tr></thead><tbody id="area-rows"></tbody></table></div><p id="area-warning" class="analytics-note"></p></div></section>
+    <section id="trends" class="analysis-section"><div class="section-heading"><div><div class="eyebrow">03 / TIME TRENDS</div><h2>Follow recorded waste over time</h2><p>Gaps remain visible. Each point reports its observation coverage.</p></div></div><div class="panel analytics-panel"><div class="control-row"><label>Aggregation<select id="trend-grain"><option value="month">Monthly</option><option value="day">Daily</option><option value="year">Yearly</option></select></label><label>From<input id="trend-from" type="date"></label><label>To<input id="trend-to" type="date"></label><button id="trend-load" class="button secondary">Load trend</button></div><div id="trend-message" class="empty-copy" role="status">Select a dataset with recorded dates to load trends.</div><div class="chart-scroll"><svg id="trend-chart" class="hidden data-chart trend-chart" role="img" aria-label="Recorded waste trend"></svg></div><div id="trend-caption" class="analytics-note"></div><div class="table-wrap"><table class="analytics-table"><thead><tr><th>Period</th><th>Recorded waste</th><th>Records with amount</th><th>Records</th></tr></thead><tbody id="trend-rows"></tbody></table></div></div></section>
+    <section id="clustering" class="analysis-section"><div class="section-heading"><div><div class="eyebrow">04 / EXPLORATORY ANALYSIS</div><h2>Clustering Lab</h2><p>Reproducible K-means over selected numeric values retrieved from Hive.</p></div></div><div class="panel analytics-panel"><div id="cluster-features" class="feature-grid"></div><div class="control-row"><label>Clusters<select id="cluster-count"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label><button id="cluster-run" class="button primary" disabled>Run clustering</button><button id="cluster-export" class="button secondary" disabled>Export assignments CSV</button></div><div id="cluster-message" class="empty-copy" role="status">Select a dataset with suitable numeric features.</div><div id="cluster-results"></div></div></section>
+    <section id="economics" class="analysis-section"><div class="section-heading"><div><div class="eyebrow">05 / ECONOMIC ANALYSIS</div><h2>No cost estimate available</h2><p>We only show reported values supported by source records.</p></div></div><div class="panel analytics-panel"><p class="empty-copy">The imported Hive schema contains waste quantities and material categories, but no reported costs, prices, or revenue fields. An economic estimate cannot be calculated from this dataset.</p></div></section>
+    <section id="import" class="import-section"><div class="section-heading"><div><div class="eyebrow">01 / DATA INTAKE</div><h2>Bring in a dataset</h2><p>Preview, map, validate, then write records to Apache Hive.</p></div><span class="required-tag">CSV · XLSX · XLS</span></div>
+      <ol class="intake-steps" aria-label="Data import steps">
+        <li class="active" data-step="1"><span>01</span><b>Preview file</b><small>Choose CSV or Excel</small></li>
+        <li data-step="2"><span>02</span><b>Map &amp; validate</b><small>Confirm fields and units</small></li>
+        <li data-step="3"><span>03</span><b>Import to Hive</b><small>Verify before analysis</small></li>
+      </ol>
+      <div class="import-card">
+        <div class="demo-box" style="margin-bottom: 16px; padding: 14px 18px; background: #edf5ea; border: 1px solid #c9dec4; border-radius: 9px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <strong style="color: #174232; font-size: 13px;">Bengaluru Municipal Sample Dataset</strong>
+            <p style="margin: 3px 0 0; color: #406050; font-size: 11px;">Load 40 realistic daily ward waste records across 8 BBMP wards (Mahadevapura, Koramangala, Indiranagar, Whitefield, etc.) with instant general statistics.</p>
+          </div>
+          <button id="intake-load-sample-btn" type="button" class="button primary" style="padding: 7px 16px; font-size: 11px; white-space: nowrap;">Load Sample Data</button>
+        </div>
+        <div class="upload-row"><label class="file-picker" for="file-input"><span class="upload-icon">↑</span><span><b>Choose a file</b><small>CSV or Excel, up to 32 MB</small></span></label><input id="file-input" type="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"><button id="upload-btn" class="button secondary">Preview file</button></div><div id="upload-error" class="error-text" role="alert"></div>
+        <div id="preview-panel" class="hidden"><div class="preview-summary" id="preview-summary"></div><div class="table-wrap preview-table-wrap"><table id="preview-table"><thead></thead><tbody></tbody></table></div>
+          <div class="mapping-heading"><div><h3>Map your columns</h3><p>Only fields you map are imported. Unmapped optional fields remain null.</p></div></div><div id="mapping-grid" class="mapping-grid"></div>
+          <div class="mapping-options"><label>Waste unit<select id="unit-select"><option value="unknown">Unknown / not stated</option><option value="kg">kg</option><option value="tonnes">tonnes</option><option value="tonnes/day">tonnes/day</option><option value="kg/day">kg/day</option><option value="kg/person/day">kg/person/day</option><option value="other">Other (enter unit)</option></select><input id="custom-unit" class="hidden" type="text" maxlength="40" placeholder="Enter unit as stated in source"></label><label>Ward geography system<input id="geo-input" type="text" placeholder="e.g. BBMP 2022; leave blank if unknown"></label></div>
+          <p id="unit-suggestion-message" class="analytics-note unit-suggestion-message" role="status">Confirm the waste unit against the source.</p>
+          <button id="validate-btn" class="button primary">Validate mapping</button><div id="validation-panel" class="hidden"></div><div id="import-result" class="hidden"></div>
+        </div>
+      </div>
+    </section>
+    <footer><span>FIELDNOTE · BENGALURU WASTE INTELLIGENCE</span><span>Analytical records are queried from Apache Hive.</span></footer>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body></html>
